@@ -47,14 +47,15 @@ export default function App() {
 
     }
     if (gasto.id) {
-      setGastos(gastos.map(gastoState => gastoState.id === gasto.id ? gasto : gastoState));
+      setGastos(gastos.map(gastoState => gastoState.id === gasto.id ? gasto : gastoState));      
+      setModal(false);
       return
-    } else { 
+    } else {
       gasto.id = generarId();
       gasto.fecha = Date.now();
-      setGastos([...gastos, gasto]);
+      setGastos([...gastos, gasto]); 
+      setModal(false);
     }
-    setModal(false);
   };
 
   const eliminarGasto = (id: number | string) => {
@@ -75,7 +76,7 @@ export default function App() {
           style: "cancel",
         },
       ]
-    ) 
+    )
   };
 
   return (
