@@ -15,15 +15,16 @@ interface Props {
   setModal: (modal: boolean) => void;
   handleGasto: (gasto: Gasto) => void
   setGasto: (gasto: Gasto) => void
+  eliminarGasto?: (id: number | string) => void
   gasto?: Gasto
 }
 
-export default function FormularioGasto({ setModal, handleGasto, setGasto, gasto }: Props) {
+export default function FormularioGasto({ setModal, handleGasto, setGasto, gasto, eliminarGasto }: Props) {
 
   const [nombre, setNombre] = React.useState('');
   const [cantidad, setCantidad] = React.useState(0);
   const [categoria, setCategoria] = React.useState('');
-  const [id, setId] = React.useState<number | string>();
+  const [id, setId] = React.useState<number | string>(0);
   const [fecha, setFecha] = React.useState<number | Date>();
 
   useEffect(() => {
@@ -31,20 +32,24 @@ export default function FormularioGasto({ setModal, handleGasto, setGasto, gasto
       setNombre(gasto.nombre);
       setCantidad(gasto.cantidad);
       setCategoria(gasto.categoria);
-      setId(gasto.id);
+      setId(gasto.id as number);
       setFecha(gasto.fecha);
     }
   }, [gasto]);
 
   return (
     <SafeAreaView style={styles.contenedor}>
-      <View>
+      <View style={styles.contenedorBotones}>
         <Pressable onLongPress={() => {
           setGasto({} as Gasto);
           setModal(false);
         }} onPress={() => setModal(false)} style={styles.btnCancelar}>
           <Text style={styles.btnCancelarTexto}>Cancelar</Text>
         </Pressable>
+
+        {gasto?.id && <Pressable onLongPress={() => eliminarGasto && eliminarGasto(id)} style={{ ...styles.btnCancelar, backgroundColor: '#dc2626' }}>
+          <Text style={styles.btnCancelarTexto}>Eliminar</Text>
+        </Pressable>}
       </View>
 
 
@@ -95,6 +100,11 @@ const styles = StyleSheet.create({
   contenedor: {
     backgroundColor: '#1E40AF',
     flex: 1,
+  },
+  contenedorBotones: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
   },
   formulario: {
     ...globalStyles.contendor,

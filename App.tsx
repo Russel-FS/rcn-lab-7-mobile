@@ -52,6 +52,27 @@ export default function App() {
     setModal(false);
   };
 
+  const eliminarGasto = (id: number | string) => {
+    Alert.alert(
+      "¿Deseas eliminar el gasto?",
+      "Un gasto eliminado no se puede recuperar",
+      [
+        {
+          text: "Si, Eliminar",
+          onPress: () => {
+            setGastos(gastos.filter(gasto => gasto.id !== id));
+            setModal(false);
+            setGasto({} as Gasto);
+          },
+        },
+        {
+          text: "No, Cancelar",
+          style: "cancel",
+        },
+      ]
+    ) 
+  };
+
   return (
     <>
       <Container>
@@ -74,7 +95,7 @@ export default function App() {
           )}
           {modal && (
             <Modal visible={modal} animationType="slide">
-              <FormularioGasto handleGasto={handleGasto} gasto={gasto} setGasto={setGasto} setModal={setModal} />
+              <FormularioGasto eliminarGasto={eliminarGasto} handleGasto={handleGasto} gasto={gasto} setGasto={setGasto} setModal={setModal} />
             </Modal>
           )}
 
