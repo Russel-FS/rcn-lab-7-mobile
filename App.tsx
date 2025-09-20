@@ -34,6 +34,11 @@ export default function App() {
     }
   };
 
+  const handleModal = () => {
+    setGasto({} as Gasto);
+    setModal(!modal);
+  };
+
   const handleGasto = (gasto: Gasto) => {
 
     if ([gasto.cantidad, gasto.categoria, gasto.nombre].includes('')) {
@@ -91,7 +96,7 @@ export default function App() {
           </View>
 
           {validarPresupuesto && (
-            <ListadoGastos setGasto={setGasto} setModal={setModal} gastos={gastos} ></ListadoGastos>
+            <ListadoGastos setGasto={setGasto} setModal={handleModal} gastos={gastos} ></ListadoGastos>
           )}
           {modal && (
             <Modal visible={modal} animationType="slide">
