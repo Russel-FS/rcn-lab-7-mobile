@@ -2,36 +2,29 @@ import { StatusBar } from 'expo-status-bar';
 
 import './global.css';
 import { Container } from '~/components/Container';
-import { Alert, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Header from '~/components/Header';
 import NuevoPresupuesto from '~/components/NuevoPresupuesto';
 import { useState } from 'react';
 import ControlPresupuesto from '~/components/ControlPresupuesto';
 import FormularioGasto from '~/components/FormularioGasto';
+import { generarId } from '~/helpers';
+import ListadoGastos from '~/components/ListadoGastos';
 
 export interface Gasto {
-  id: number;
+  id?: number | string;
   cantidad: number;
+  nombre: string;
+  categoria: string;
+  fecha: number | Date;
 }
 
 export default function App() {
   const [validarPresupuesto, setValidarPresupuesto] = useState<boolean>(false);
   const [presupuesto, setPresupuesto] = useState<number>(0);
   const [modal, setModal] = useState<boolean>(false);
-  const [gastos, setGastos] = useState<Gasto[]>([
-    {
-      id: 1,
-      cantidad: 30,
-    },
-    {
-      id: 2,
-      cantidad: 40,
-    },
-    {
-      id: 3,
-      cantidad: 50,
-    },
-  ]);
+  const [gastos, setGastos] = useState<Gasto[]>([]);
+  const [gasto, setGasto] = useState<Gasto>();
   const handlePresupuesto = (presupuesto: number) => {
     console.log('Presupuesto:', presupuesto);
     if (Number(presupuesto) > 0) {
@@ -41,26 +34,51 @@ export default function App() {
     }
   };
 
+  const handleGasto = (gasto: Gasto) => {
+
+    if ([gasto.cantidad, gasto.categoria, gasto.nombre].includes('')) {
+      Alert.alert('Error', 'Todos los campos son obligatorios', [{ text: 'OK' }]);
+      return
+
+    }
+    if (gasto.id) {
+      setGastos(gastos.map(gastoState => gastoState.id === gasto.id ? gasto : gastoState));
+      return
+    } else { 
+      gasto.id = generarId();
+      gasto.fecha = Date.now();
+      setGastos([...gastos, gasto]);
+    }
+    setModal(false);
+  };
+
   return (
     <>
       <Container>
-        <View style={styles.header}>
-          <Header />
-          {validarPresupuesto ? (
-            <ControlPresupuesto gastos={gastos} presupuesto={presupuesto} />
-          ) : (
-            <NuevoPresupuesto
-              presupuesto={presupuesto}
-              setPresupuesto={setPresupuesto}
-              handlePresupuesto={handlePresupuesto}
-            />
+        <ScrollView>
+          <View style={styles.header}>
+            <Header />
+            {validarPresupuesto ? (
+              <ControlPresupuesto gastos={gastos} presupuesto={presupuesto} />
+            ) : (
+              <NuevoPresupuesto
+                presupuesto={presupuesto}
+                setPresupuesto={setPresupuesto}
+                handlePresupuesto={handlePresupuesto}
+              />
+            )}
+          </View>
+
+          {validarPresupuesto && (
+            <ListadoGastos setGasto={setGasto} setModal={setModal} gastos={gastos} ></ListadoGastos>
           )}
-        </View>
-        {modal && (
-          <Modal visible={modal} animationType="slide">
-            <FormularioGasto />
-          </Modal>
-        )}
+          {modal && (
+            <Modal visible={modal} animationType="slide">
+              <FormularioGasto handleGasto={handleGasto} gasto={gasto} setGasto={setGasto} setModal={setModal} />
+            </Modal>
+          )}
+
+        </ScrollView>
         {validarPresupuesto && (
           <Pressable onPress={() => setModal(true)}>
             <Image style={styles.imagen} source={require('./src/img/nuevo-gasto.png')} />
@@ -80,7 +98,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     position: 'absolute',
-    top: 5,
-    right: 5,
+    bottom: 20,
+    right: 10,
   },
 });
